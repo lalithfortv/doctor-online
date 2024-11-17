@@ -8,7 +8,7 @@ pipeline{
         }
         stage("Dev Deploy"){
            steps{
-              sshagent(['tomcat-dev']) {
+              sshagent(['ec2-user']) {
                 // Copy war file to tomcat dev server
                 sh "scp -o StrictHostKeyChecking=no target/doctor-online.war ec2-user@100.26.32.135:/opt/tomcat10/webapps/"
                 // Restart tomcat server
