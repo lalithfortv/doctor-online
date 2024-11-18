@@ -9,6 +9,7 @@ pipeline{
         stage("Nexus Upload"){
             steps{
                script{
+                //Nexus upload
                 def pom = readMavenPom file: 'pom.xml'
                 def version = pom.version
                 nexusArtifactUploader artifacts: [[artifactId: 'doctor-online', classifier: '', file: 'target/doctor-online.war', type: 'war']], credentialsId: 'admin', groupId: 'in.javahome', nexusUrl: 'http://54.226.165.197:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'doctor-online', version: version
