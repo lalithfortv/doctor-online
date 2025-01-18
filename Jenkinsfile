@@ -3,6 +3,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'doctor-online'
         DOCKER_REGISTRY = 'docker.io'
+        DOCKER_USER = 'lalith767'
         DOCKER_CREDENTIALS = credentials('docker-hub-credentials') // Reference the Jenkins credentials
     }
     stages {
@@ -16,7 +17,7 @@ pipeline {
                 script {
                     // Get the Git commit short hash for the tag
                     def tag = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-                    env.DOCKER_TAG = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${tag}"
+                    env.DOCKER_TAG = "${DOCKER_REGISTRY}/${DOCKER_USER}/${IMAGE_NAME}:${tag}"
                     // Build the Docker image
                     sh "docker build -t ${DOCKER_TAG} ."
                 }
