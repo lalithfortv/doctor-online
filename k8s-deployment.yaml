@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doctor-online
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: doctor-online
+  template:
+    metadata:
+      labels:
+        app: doctor-online
+    spec:
+      containers:
+      - name: doctor-online
+        image: IMAGE_PLACEHOLDER
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: doctor-online-service
+spec:
+  selector:
+    app: doctor-online
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: NodePort
