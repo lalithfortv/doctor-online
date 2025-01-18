@@ -4,7 +4,7 @@ pipeline {
         IMAGE_NAME = 'doctor-online'
         DOCKER_REGISTRY = 'docker.io'
         DOCKER_USER = 'lalith767'
-        DOCKER_CREDENTIALS = credentials('docker-hub-credentials') // Reference the Jenkins credentials
+        DOCKER_CREDENTIALS = credentials('docker-hub-credentials') // Reference Jenkins Docker Hub credentials
     }
     stages {
         stage('Clone Repository') {
@@ -18,7 +18,7 @@ pipeline {
                     // Get the Git commit short hash for the tag
                     def tag = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                     env.DOCKER_TAG = "${DOCKER_REGISTRY}/${DOCKER_USER}/${IMAGE_NAME}:${tag}"
-                    // Build the Docker image
+                    // Build the Docker image with the tag
                     sh "docker build -t ${DOCKER_TAG} ."
                 }
             }
@@ -27,7 +27,7 @@ pipeline {
             steps {
                 script {
                     // Authenticate and push to Docker Hub
-                    docker.withRegistry('https://docker.io', 'docker-hub-credentials') {
+                    docker.withRegistry('https://docker.io', DOCKER_CREDENTIALS) {
                         sh "docker push ${DOCKER_TAG}"
                     }
                 }
@@ -36,11 +36,11 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Update Kubernetes deployment YAML with the new image tag
+                    // Ensure the Kubernetes deployment YAML is updated with the correct image tag
                     sh "sed -i 's|IMAGE_PLACEHOLDER|${DOCKER_TAG}|' k8s-deployment.yaml"
-                    // Apply the deployment in Kubernetes
+                    // Apply the updated Kubernetes deployment configuration
                     sh "kubectl apply -f k8s-deployment.yaml"
-                    // Scale the deployment to 3 replicas
+                    // Scale the Kubernetes deployment to 3 replicas
                     sh "kubectl scale deployment doctor-online --replicas=3"
                 }
             }
