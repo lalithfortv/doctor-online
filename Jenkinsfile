@@ -2,6 +2,8 @@ pipeline {
     agent { label 'slave01' }
     environment {
         IMAGE_NAME = 'doctor-online'
+        DOCKER_REGISTRY = 'docker.io'  // Docker Hub registry
+        DOCKER_CREDENTIALS = credentials('docker-hub-credentials') // Jenkins credentials ID for Docker Hub
     }
     stages {
         stage('Clone Repository') {
@@ -17,6 +19,17 @@ pipeline {
                     env.DOCKER_TAG = "${IMAGE_NAME}:${tag}"
                     // Build the Docker image from the repository context
                     sh "docker build -t ${DOCKER_TAG} ."
+                }
+            }
+        }
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+                    // Login to Docker Hub using Jenkins credentials
+                    withDockerRegistry([credentialsId: 'docker-hub-credentials', url: "https://${DOCKER_REGISTRY}"]) {
+                        // Push the Docker image to Docker Hub
+                        sh "docker push ${DOCKER_TAG}"
+                    }
                 }
             }
         }
